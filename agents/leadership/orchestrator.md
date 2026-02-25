@@ -195,6 +195,33 @@ After ANY development agent completes (python-developer, api-developer, frontend
 - The test-engineer runs in **paired mode**: it receives the developer agent's output and writes/runs tests for the changes made.
 - This is automatic — do NOT ask the user for permission to run tests.
 
+### Multi-Agent Coordination: Teams Framework
+
+When coordinating 3+ agents with interdependent work, use Claude Code's Teams framework instead of independent Tasks.
+
+**When to use Teams vs independent Tasks:**
+
+| Scenario | Approach | Why |
+|----------|----------|-----|
+| 2 independent agents | Task (background) | Simple, no coordination needed |
+| 3+ agents, independent work | Task (parallel background) | Low overhead, orchestrator merges results |
+| 3+ agents, interdependent work | Teams (TeamCreate) | Agents message each other, share task lists |
+| Complex feature with handoffs | Teams (TeamCreate) | Direct agent-to-agent coordination |
+
+**How to use Teams:**
+
+1. Create team: `TeamCreate({ team_name: "feature-x", description: "..." })`
+2. Spawn teammates: `Task({ subagent_type: "general-purpose", team_name: "feature-x", name: "dbt-dev", prompt: "..." })`
+3. Agents communicate: `SendMessage({ type: "message", recipient: "dbt-dev", content: "...", summary: "..." })`
+4. Shutdown: `SendMessage({ type: "shutdown_request", recipient: "dbt-dev" })`
+5. Cleanup: `TeamDelete()`
+
+**Team members can:**
+- Send direct messages to each other
+- Read shared task lists at `~/.claude/tasks/{team-name}/`
+- Go idle between turns and be woken by messages
+- Discover teammates via `~/.claude/teams/{team-name}/config.json`
+
 ### Phase 4: Conflict Resolution
 
 When agents produce conflicting recommendations:
