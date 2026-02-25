@@ -87,13 +87,8 @@ Gather the current state of the agent system.
    ls ~/.claude/rules/*.md 2>/dev/null
    ```
 
-3. **Check agent health:**
-   | Check | How |
-   |-------|-----|
-   | Line count | Each agent file should be < 350 lines |
-   | Required sections | YAML frontmatter, Prerequisites, Workflow, Output, Constraints |
-   | Broken references | Rule files referenced in agents must exist |
-   | Stale content | Agents referencing removed tools or deprecated patterns |
+3. **Read the audit checklist:**
+   Read `docs/AUDIT_CHECKLIST.md` — run the 72 checks across 11 categories (file integrity, structure, cross-references, YAML, routing, rules, freshness, symlinks, enforcement chain, single source of truth, quality scoring). Use the specific commands and pass/fail criteria defined there.
 
 4. **Check project overrides (if in a project):**
    ```bash

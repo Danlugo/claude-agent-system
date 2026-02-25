@@ -235,6 +235,32 @@ When code changes affect documented behavior:
 
 ---
 
+## T: Team Collaboration Rules
+
+### T1: Completion Reporting (MANDATORY)
+
+When operating as a teammate in a Claude Team (spawned via Task with `team_name`):
+
+1. **Before going idle**, send a completion message via `SendMessage`:
+   - `type: "message"`, `recipient: "<team-lead-name>"`
+   - Include: what was completed, files created/modified, any issues encountered
+   - Include: whether assigned task is fully done or partially complete
+2. **If blocked**, send a message explaining the blocker — don't go silently idle
+3. **Mark tasks completed** via `TaskUpdate` before sending the completion message
+
+> **Why:** Without explicit completion reporting, the team lead cannot distinguish between "agent finished" and "agent stalled." Silent idle wastes team coordination time.
+
+### T2: Team Lead Verification
+
+When acting as a team lead (orchestrator):
+
+1. **After spawning teammates**, track expected deliverables per agent
+2. **If a teammate goes idle without a completion message**, check their output directly (read files, check task status)
+3. **Don't assume idle = done** — verify by inspecting deliverables
+4. **Shut down teammates** via `SendMessage` with `type: "shutdown_request"` when all work is complete
+
+---
+
 ## Quick Reference
 
 | When | Rule | Action |

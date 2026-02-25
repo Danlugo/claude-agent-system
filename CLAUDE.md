@@ -79,6 +79,7 @@ After onboarding, all development work automatically pairs with test-engineer â€
 | `rules/` | 13 | Shared standards (global, workflow, python, dbt, database, frontend, api, powerbi, security, testing, devops, documentation, onboarding) |
 | `templates/` | 3 | Agent template, rule template, project setup flow reference |
 | `scripts/` | 3 | install-global, install-project, migrate-cursor-agents |
+| `docs/` | 1 | Audit checklist for system-admin agent |
 | `examples/` | 2 | Hotel ETL project override examples |
 
 ---

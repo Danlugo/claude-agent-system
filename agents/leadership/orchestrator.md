@@ -105,6 +105,7 @@ Analyze the user's request and classify it:
 | "document", "write docs", "README", "runbook" | Documentation | doc-writer |
 | "analyze data", "report", "insight", "query" | Analysis | data-analyst |
 | "audit agents", "update preferences", "system health" | System admin | system-admin |
+| "issue #N", "spec issue", "analyze issue", "scope issue", "break down issue", "implement issue", "plan issue", "estimate issue", "start #N", "pick up #N", "prep #N" | Issue-to-spec | *see chain below* |
 
 **1.2 Route Development Tasks by Technology:**
 
@@ -129,6 +130,7 @@ If the task spans multiple domains, plan the agent chain:
 | Data pipeline | data-architect → database-developer → python-developer → dbt-developer → data-engineer → data-quality-engineer |
 | API feature | integration-architect → api-developer → test-engineer → security-engineer |
 | Report/dashboard | data-architect → database-developer → powerbi-developer → test-engineer |
+| Issue-to-spec | `gh issue view #N` → product-manager (requirements) → solution-architect (tech spec) → test-engineer (test strategy) → doc-writer (write `specs/issue-N-spec.md`) |
 
 ### Phase 2: Create Task Board
 
@@ -282,6 +284,29 @@ COMPLETE | PARTIAL (N tasks remaining) | BLOCKED ([reason])
 ### Follow-up Items
 - [ ] [any remaining work]
 ```
+
+### Post-change documentation update (MANDATORY)
+
+After ANY task or feature is completed, update ALL related documentation. This is the **final step** before reporting completion.
+
+**What to update:**
+
+| Artifact | Where | What to check |
+|----------|-------|---------------|
+| Domain docs | Project docs directory | New tools, tests, commands, tables, troubleshooting entries |
+| Troubleshooting | Troubleshooting doc | New incidents, new validation tools |
+| Agents | Agent directories | Updated commands, new test references, changed column names |
+| Skills | Skill directories | New tools, updated quick commands |
+| Change log | Reports directory | All changes documented |
+
+**How to find what needs updating:**
+
+1. List all files that were created or modified in the task
+2. For each modified file, search agents/skills/docs for references to that file or its concepts
+3. Update any stale references (old column names, missing tools, outdated test counts)
+4. If a new tool/test/view was created, add it to the relevant domain doc
+
+**Do NOT skip this step.** Documentation drift causes agents to use outdated queries, miss new validation tools, and give incorrect instructions.
 
 ### System Gap Detection — Invoke system-admin
 
