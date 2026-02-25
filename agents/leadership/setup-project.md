@@ -154,17 +154,36 @@ Would you like to proceed with these, or adjust the list?
 
 Wait for user confirmation.
 
-### Phase 3: Handle Cursor Migration (if applicable)
+### Phase 3: Handle Existing Agents (if applicable)
 
-**If `.cursor/agents/` exists:**
-
-Count and list the existing Cursor agents:
+Check for existing agents in BOTH locations:
 
 ```bash
+ls {project}/.claude/agents/*.md 2>/dev/null
 ls {project}/.cursor/agents/*.md 2>/dev/null
 ```
 
-Present options:
+**If `.claude/agents/` has existing agents:**
+
+```
+I found N existing Claude Code agents in this project:
+  - orchestrator.md
+  - python-developer.md
+  - ...
+
+How would you like to handle them?
+
+1. **Keep as overrides** — Install global agents, keep these as project overrides
+   Best if: These are project-specific customizations you want to preserve
+
+2. **Replace** — Remove existing agents, install fresh from the global system
+   Best if: These are outdated or from a different agent system
+
+3. **Review first** — Show me what each does so I can decide
+   Best if: You're not sure what these agents do
+```
+
+**If `.cursor/agents/` has existing agents:**
 
 ```
 I found N Cursor agents in this project:
@@ -177,23 +196,19 @@ How would you like to handle them?
 1. **Migrate (hybrid)** — Convert to Claude Code format, keep originals
    Best if: You still use Cursor sometimes and want both to work
 
-2. **Replace** — Install global agents, don't migrate Cursor-specific ones
-   Best if: You're fully switching to Claude Code
+2. **Keep alongside** — Install global agents, leave Cursor agents as-is
+   Best if: Cursor agents handle domain tasks, global agents handle development
 
-3. **Skip** — Leave Cursor agents as-is, just install global agents alongside
+3. **Skip** — Don't touch Cursor agents at all
    Best if: You want to try Claude Code without changing anything
 ```
 
-**If option 1 (Migrate):**
+**If option 1 (Migrate Cursor):**
 ```bash
 bash {scripts_dir}/migrate-cursor-agents.sh {project}
 ```
 
-**If option 2 (Replace):**
-Proceed to install global agents only (Phase 4).
-
-**If option 3 (Skip):**
-Proceed to install global agents only (Phase 4).
+**For all other options:** Proceed to Phase 4 with the user's choices.
 
 ### Phase 4: Install & Scaffold
 

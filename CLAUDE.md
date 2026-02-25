@@ -165,13 +165,15 @@ Every code change follows this cycle — enforced by the orchestrator:
 
 ### Trigger Keywords
 
-Any of these phrases should trigger the setup-project agent:
+Any of these phrases should trigger the setup-project agent. **These keywords take priority over orchestrator-first (P6)** — even if the project already has agents in `.claude/agents/` or `.cursor/agents/`, these keywords mean the user wants to install/configure the agent system, not do software work.
 
 | User Says | Action |
 |-----------|--------|
 | "set up agents" / "setup agents" / "install agents" | Spawn **setup-project** agent |
 | "onboard this project" / "onboard" | Spawn **setup-project** agent |
 | "initialize agents" / "init agents" | Spawn **setup-project** agent |
+
+**If the project already has agents**, setup-project will detect them and ask how to handle them (keep, replace, or migrate). It will never blindly overwrite existing agents.
 
 ### The Setup → Orchestrator Handoff
 

@@ -12,7 +12,7 @@ git clone https://github.com/Danlugo/claude-agent-system.git
 bash claude-agent-system/scripts/install-global.sh
 
 # 3. Use in any project
-# Just ask Claude: "Set up agents for this project"
+# Ask Claude: "install agents" or "onboard this project"
 ```
 
 **Requirements:** Claude Code v1.0.60+ | macOS or Linux (WSL on Windows)
@@ -72,15 +72,19 @@ Every developer agent automatically pairs with `test-engineer` after completing 
 
 ## Setting Up a Project
 
-After the global install, go to any project and ask Claude:
+After the global install, go to any project and tell Claude:
 
-> "Set up agents for this project"
+> "install agents" or "onboard this project"
 
-The **setup-project** agent will:
-1. Detect your tech stack (Python, dbt, React, FastAPI, etc.)
-2. Recommend agents based on what it finds
-3. Install them with your approval
-4. Create a project `CLAUDE.md` if one doesn't exist
+These keywords trigger the **setup-project** agent, which:
+1. Detects your tech stack (Python, dbt, React, FastAPI, etc.)
+2. Checks for existing agents (`.claude/agents/`, `.cursor/agents/`) and offers to keep, replace, or migrate them
+3. Recommends agents based on what it finds
+4. Installs them with your approval
+5. Creates a project `CLAUDE.md` if one doesn't exist
+6. Hands off to the **orchestrator** for project onboarding
+
+**If the project already has agents**, setup-project detects them and asks how to handle them — it won't blindly overwrite anything. Use the same keywords ("install agents", "onboard") even for projects with existing agents.
 
 On the first session, the **orchestrator** runs a project onboarding:
 - **New projects** -- sets up standards, scaffolds structure, initializes test infrastructure
@@ -92,7 +96,7 @@ Use `templates/agent-template.md` as your starting point. Every agent has:
 
 1. **YAML frontmatter** -- name, description, tools, model
 2. **Prerequisites** -- mandatory reading, error handling, environment rules
-3. **5-phase workflow** -- Understand, Plan, Execute, Test, Validate
+3. **6-phase workflow** -- Understand, Plan, Execute, Test & Run, Update Docs, Final Validation
 4. **Output template** -- structured report format
 5. **Constraints** -- clear boundaries and delegation rules
 
