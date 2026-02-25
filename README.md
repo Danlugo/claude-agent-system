@@ -12,7 +12,7 @@ git clone https://github.com/Danlugo/claude-agent-system.git
 bash claude-agent-system/scripts/install-global.sh
 
 # 3. Use in any project
-# Ask Claude: "install agents" or "onboard this project"
+# Ask Claude: "setup CAS" or "install CAS agents"
 ```
 
 **Requirements:** Claude Code v1.0.60+ | macOS or Linux (WSL on Windows)
@@ -74,9 +74,9 @@ Every developer agent automatically pairs with `test-engineer` after completing 
 
 After the global install, go to any project and tell Claude:
 
-> "install agents" or "onboard this project"
+> "setup CAS" or "install CAS agents"
 
-These keywords trigger the **setup-project** agent, which:
+**CAS = Claude Agent System.** Using "CAS" in the keyword avoids confusion with other agent systems or existing project agents. These keywords trigger the **setup-project** agent, which:
 1. Detects your tech stack (Python, dbt, React, FastAPI, etc.)
 2. Checks for existing agents (`.claude/agents/`, `.cursor/agents/`) and offers to keep, replace, or migrate them
 3. Recommends agents based on what it finds
@@ -84,7 +84,7 @@ These keywords trigger the **setup-project** agent, which:
 5. Creates a project `CLAUDE.md` if one doesn't exist
 6. Hands off to the **orchestrator** for project onboarding
 
-**If the project already has agents**, setup-project detects them and asks how to handle them — it won't blindly overwrite anything. Use the same keywords ("install agents", "onboard") even for projects with existing agents.
+**If the project already has agents**, setup-project detects them and asks how to handle them — it won't blindly overwrite anything.
 
 On the first session, the **orchestrator** runs a project onboarding:
 - **New projects** -- sets up standards, scaffolds structure, initializes test infrastructure

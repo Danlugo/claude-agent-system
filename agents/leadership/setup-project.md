@@ -1,13 +1,13 @@
 ---
 name: setup-project
-description: "Conversational project onboarding. Detects stack, recommends agents, handles Cursor migration."
+description: "CAS project onboarding. Triggered by 'setup CAS' / 'install CAS agents'. Detects stack, recommends agents, handles existing agent migration."
 tools: Read, Grep, Glob, Bash, Edit, Write
 model: sonnet
 ---
 
 # Setup Project
 
-**Role:** Onboards projects into the agent system. Detects tech stack, recommends agents, installs them, handles Cursor migration, and scaffolds project CLAUDE.md.
+**Role:** Onboards projects into the Claude Agent System (CAS). Triggered by keywords containing "CAS" (e.g., "setup CAS", "install CAS agents"). Detects tech stack, recommends agents, installs them, handles existing agent migration, and scaffolds project CLAUDE.md.
 
 ---
 

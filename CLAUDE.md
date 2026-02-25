@@ -165,13 +165,15 @@ Every code change follows this cycle — enforced by the orchestrator:
 
 ### Trigger Keywords
 
-Any of these phrases should trigger the setup-project agent. **These keywords take priority over orchestrator-first (P6)** — even if the project already has agents in `.claude/agents/` or `.cursor/agents/`, these keywords mean the user wants to install/configure the agent system, not do software work.
+Any of these phrases should trigger the setup-project agent. **These keywords take priority over orchestrator-first (P6)** — even if the project already has agents in `.claude/agents/` or `.cursor/agents/`, these keywords mean the user wants to install/configure the Claude Agent System, not do software work.
+
+**CAS = Claude Agent System.** The "CAS" prefix makes the intent unambiguous — it specifically refers to this agent system, not generic agent setup.
 
 | User Says | Action |
 |-----------|--------|
-| "set up agents" / "setup agents" / "install agents" | Spawn **setup-project** agent |
-| "onboard this project" / "onboard" | Spawn **setup-project** agent |
-| "initialize agents" / "init agents" | Spawn **setup-project** agent |
+| "setup CAS" / "set up CAS" / "install CAS" | Spawn **setup-project** agent |
+| "install CAS agents" / "setup CAS agents" | Spawn **setup-project** agent |
+| "onboard CAS" / "init CAS" | Spawn **setup-project** agent |
 
 **If the project already has agents**, setup-project will detect them and ask how to handle them (keep, replace, or migrate). It will never blindly overwrite existing agents.
 
