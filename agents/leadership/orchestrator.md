@@ -175,7 +175,8 @@ Task(
            - Completed so far: [previous tasks]\n
            - Next in chain: [downstream tasks]\n
            - Environment: DEV\n\n
-           Read CLAUDE.md for project rules before starting."
+           Read CLAUDE.md for project rules before starting.\n\n
+           IMPORTANT (Rule T1): When your task is complete, send a completion message via SendMessage to the team lead. Include: files changed, status (done/blocked), issues found. Do NOT go idle without reporting."
 )
 ```
 
@@ -218,11 +219,11 @@ When coordinating 3+ agents with interdependent work, use Claude Code's Teams fr
 4. Shutdown: `SendMessage({ type: "shutdown_request", recipient: "dbt-dev" })`
 5. Cleanup: `TeamDelete()`
 
-**Team members can:**
-- Send direct messages to each other
-- Read shared task lists at `~/.claude/tasks/{team-name}/`
-- Go idle between turns and be woken by messages
-- Discover teammates via `~/.claude/teams/{team-name}/config.json`
+**MANDATORY for every teammate prompt (Rule T1):**
+Include in every teammate's prompt: *"When done, send a completion message via SendMessage to the team lead. Include: files changed, status (done/blocked), any issues. Do NOT go idle without reporting."*
+
+**Team lead follow-up (Rule T2):**
+After spawning teammates: wait for completion messages, verify deliverables, don't assume idle = done. Shut down teammates via `shutdown_request` when all work is complete.
 
 ### Phase 4: Conflict Resolution
 

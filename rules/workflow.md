@@ -40,13 +40,19 @@ Read project `CLAUDE.md` and any relevant project docs.
 | Data operations | ETL docs, data flow docs |
 | Deployments | Runbooks, deployment docs |
 
-### Step 3: Identify Applicable Agents
+### Step 3: Delegate to Agent (MANDATORY — P6)
 
-Check if an agent exists for this task type (P6: Agent First).
+If an agent exists for this task, **spawn it via the Task tool. Do NOT plan or implement the task yourself.**
 
-| Task Type | Check Agent |
+| Task Scope | Action |
+|-----------|--------|
+| Multi-step / multi-domain | **Spawn orchestrator** — it routes to specialists |
+| Single-domain coding | **Spawn the specialist** directly (see table below) |
+| Simple lookup / question | Handle directly — no agent needed |
+
+| Task Type | Spawn Agent |
 |-----------|-------------|
-| Full feature | orchestrator → routes to specialists |
+| Full feature | **orchestrator** → routes to specialists |
 | Architecture | solution-architect, data-architect, integration-architect |
 | Python code | python-developer |
 | dbt models | dbt-developer |
@@ -63,6 +69,8 @@ Check if an agent exists for this task type (P6: Agent First).
 | Performance | performance-engineer |
 | Documentation | doc-writer |
 | Analysis | data-analyst |
+
+**How to spawn:** `Task(subagent_type: "[agent-name]", prompt: "...")`. If not a built-in type, use `"general-purpose"` and include the agent's `.md` content in the prompt.
 
 ### Step 4: Test & Validation Plan
 
