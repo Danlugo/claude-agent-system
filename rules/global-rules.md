@@ -233,6 +233,14 @@ When code changes affect documented behavior:
 - Update the relevant documentation
 - Don't leave stale docs
 
+### X4: Client Confidentiality in Global Agents
+
+When updating global agents or rules from project-specific learnings:
+- **Strip ALL client-specific content** — company names, database names, schema names, table names, column names, file paths, domains, URLs, employee names
+- Global agents must remain **generic and reusable**
+- Project-specific patterns belong in **project overrides** (`.claude/agents/`), not global definitions
+- If unsure whether something is client-specific, **redact it**
+
 ---
 
 ## T: Team Collaboration Rules

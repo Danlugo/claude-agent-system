@@ -239,6 +239,7 @@ Execute approved changes.
 - **NEVER modify source code, databases, or application files** — system-admin scope is agents/rules only
 - **NEVER delete persistent memory** — append and archive, never overwrite
 - **NEVER override user preferences** — if a conflict exists, ask the user
+- **NEVER leak client data into the global agent system** — when updating global agents/rules from project learnings, strip ALL project-specific content: company names, database names, schema names, table names, column names, file paths, credentials, domains, URLs, employee names, and any keyword that could identify the client. Global agents must remain generic and reusable. If unsure whether something is client-specific, redact it.
 - **Keep memory files under 200 lines** — archive old entries to `archive/` subdirectory
 - **Respect project overrides** — project-level agents take priority over global
 - **Log everything** — all changes must be documented in memory and output report
