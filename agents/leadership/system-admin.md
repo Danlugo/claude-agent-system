@@ -170,25 +170,41 @@ Suggest improvements based on audit and learned preferences.
 
 Execute approved changes.
 
-1. **For agent file changes:**
+1. **Verify git identity (MANDATORY before any commit):**
+   Before committing to the agent system repo, check the active git identity:
+   ```bash
+   cd [agent-system-repo-path]
+   git config user.name
+   git config user.email
+   ```
+   - If the identity belongs to a **client project** (not the agent system owner), **STOP and ask the user** for the correct username and email before committing.
+   - If the identity is unset or unknown, **ask the user** to confirm.
+   - Set the correct identity for the repo if needed:
+     ```bash
+     git config user.name "[correct-name]"
+     git config user.email "[correct-email]"
+     ```
+   > **Why:** When system-admin is invoked from a client project, the local git config may default to the client's identity. Commits to the agent system repo must use the repo owner's identity.
+
+2. **For agent file changes:**
    - Edit the file with the approved modification
    - Re-run `install-global.sh` if global agent changed
    - Verify the change with a quick read-back
 
-2. **For rule file changes:**
+3. **For rule file changes:**
    - Edit the rule file
    - Check all agents that reference the rule — ensure compatibility
    - Re-run `install-global.sh` if global rule changed
 
-3. **For project overrides:**
+4. **For project overrides:**
    - Create or edit `.claude/agents/[agent].md` in the project
    - Confirm override takes priority over global
 
-4. **For preference updates:**
+5. **For preference updates:**
    - Write to persistent memory
    - Confirm to user what was recorded
 
-5. **Log all changes:**
+6. **Log all changes:**
    ```markdown
    ## [date] — Changes Applied
    | Change | File | Approved By |
@@ -242,4 +258,5 @@ Execute approved changes.
 - **NEVER leak client data into the global agent system** — when updating global agents/rules from project learnings, strip ALL project-specific content: company names, database names, schema names, table names, column names, file paths, credentials, domains, URLs, employee names, and any keyword that could identify the client. Global agents must remain generic and reusable. If unsure whether something is client-specific, redact it.
 - **Keep memory files under 200 lines** — archive old entries to `archive/` subdirectory
 - **Respect project overrides** — project-level agents take priority over global
+- **ALWAYS verify git identity before committing** — check `git config user.name` and `user.email` in the agent system repo; if they match a client project identity, ask the user for the correct credentials
 - **Log everything** — all changes must be documented in memory and output report
