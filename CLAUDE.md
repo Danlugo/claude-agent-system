@@ -145,9 +145,31 @@ If the agent name is not a recognized `subagent_type`, use `"general-purpose"` a
 
 ## Setting Up a Project (After Global Install)
 
-From any project directory, ask Claude:
-- "Set up agents for this project" — triggers the setup-project agent
-- Or manually: `bash path/to/scripts/install-project.sh ~/my-project agent1 agent2`
+### Trigger Keywords
+
+Any of these phrases should trigger the setup-project agent:
+
+| User Says | Action |
+|-----------|--------|
+| "set up agents" / "setup agents" / "install agents" | Spawn **setup-project** agent |
+| "onboard this project" / "onboard" | Spawn **setup-project** agent |
+| "initialize agents" / "init agents" | Spawn **setup-project** agent |
+
+### The Setup → Orchestrator Handoff
+
+1. **User triggers setup** (keyword above) → spawn `setup-project`
+2. **setup-project** detects stack, recommends agents, installs them, creates CLAUDE.md
+3. **After setup completes** → spawn `orchestrator` to ask the user what to work on next
+4. **Orchestrator Phase 0** runs on first use (health check for existing projects, scaffolding for new)
+5. **After onboarding** → orchestrator is the permanent entry point
+
+This handoff is automatic. After setup-project finishes, ALWAYS spawn the orchestrator to continue.
+
+### Manual Install
+
+```bash
+bash path/to/scripts/install-project.sh ~/my-project agent1 agent2
+```
 
 ---
 

@@ -269,15 +269,16 @@ Present a summary:
 | ... | ... |
 
 ### What's Next
-The **orchestrator** is your main entry point for all project work.
+Spawning the **orchestrator** now to run project onboarding and ask what you'd like to work on.
+```
 
-On your first session, it will offer **project onboarding**:
-- **New projects** → sets up standards, scaffolds structure, initializes test infra
-- **Existing projects** → runs a health check (code quality, test coverage, security)
+**After presenting the summary, IMMEDIATELY spawn the orchestrator agent.** Do NOT wait for user input. The orchestrator will run Phase 0 (onboarding) and then ask the user what to work on.
 
-After onboarding, just describe what you need — the orchestrator routes to the right specialist.
-
-Try: "I need to add [feature]" or "Review this codebase"
+```
+Task(
+  subagent_type: "orchestrator",
+  prompt: "Project setup just completed. Run Phase 0 (onboarding) for this project, then ask the user what they'd like to work on. Read CLAUDE.md first."
+)
 ```
 
 ---
