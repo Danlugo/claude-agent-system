@@ -86,7 +86,7 @@ List every rule that applies by category:
 
 | Task Type | E | D | P | V | R | S | X |
 |-----------|---|---|---|---|---|---|---|
-| Code change | E1 | — | P3, P5 | V1, V4 | — | S1, S3 | X1, X2, X3 |
+| Code change | E1 | — | P3, P5, P7 | V1, V4 | — | S1, S3 | X1, X2, X3 |
 | Database change | E1, E2, E4 | D1, D2 | P5 | V1, V2, V4 | R1, R2 | — | X2, X3 |
 | Data operation | E1 | D1, D3 | P1 | V1, V2, V4 | R1, R2 | — | X2, X3 |
 | Deployment | E1 | D3 | P1 | V1, V4 | R1 | S1 | X2, X3 |
@@ -120,12 +120,13 @@ Execute the plan, validating at each step:
 
 > **A task is NOT complete until all three steps pass. Do NOT report completion until this chain finishes.**
 
-### Step A: Test & Run (V1, V4)
+### Step A: Test & Run (V1, V4, P7)
 
 1. **Write tests** for every change — unit tests minimum, integration tests for multi-component changes
-2. **Run the full test suite** — not just new tests, ALL applicable tests
-3. **Execute the code in DEV** — run the script, pipeline, feature, or endpoint to verify it works end-to-end
-4. **If tests fail or execution fails → STOP and fix** — do not proceed to Step B
+2. **Include error scenario tests** — database offline, invalid input, timeouts, partial failures (P7)
+3. **Run the full test suite** — not just new tests, ALL applicable tests
+4. **Execute the code in DEV** — run the script, pipeline, feature, or endpoint to verify it works end-to-end
+5. **If tests fail or execution fails → STOP and fix** — do not proceed to Step B
 
 | Change Type | Must Test | Must Run |
 |-------------|-----------|----------|

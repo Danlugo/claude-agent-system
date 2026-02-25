@@ -66,7 +66,7 @@ model: sonnet
 |----------|-------|---------|
 | Environment | E1, E2 | DEV default, PROD needs approval |
 | Data Safety | D1 | ASK before DELETE |
-| Process | P3, P5, P6 | No duplicates, understand first, agent first |
+| Process | P3, P5, P6, P7 | No duplicates, understand first, agent first, error handling |
 | Validation | V1, V4 | Test all changes, run/execute in DEV |
 | Recovery | R1 | Rollback plan before destructive ops |
 | Security | S1, S3 | No hardcoded secrets, no secrets in git |
@@ -102,6 +102,14 @@ model: sonnet
 1. [Step 1 with exact commands/actions]
 2. [Step 2]
 3. [Step N]
+
+**Error & Resilience (MANDATORY — P7):**
+After implementing the happy path, address failure scenarios:
+1. Identify every external dependency (database, API, file system, network)
+2. Add explicit error handling for each — retry, timeout, graceful degradation
+3. Ensure no silent failures — every caught exception is logged or re-raised
+4. Provide actionable error messages (what failed, why, how to fix)
+5. For data operations: support partial failure recovery (checkpoints, resume)
 
 ### Phase 4: Test & Run (MANDATORY — V1, V4)
 
@@ -173,6 +181,7 @@ Write structured report:
 | Tests pass | pass/fail |
 | Code runs in DEV | pass/fail |
 | No regressions | pass/fail |
+| Error handling | pass/fail |
 | Docs updated | pass/fail |
 
 ## Final Verdict

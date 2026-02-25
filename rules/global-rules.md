@@ -116,6 +116,31 @@ When a project has agents installed, **spawn the orchestrator for ALL software w
 - The orchestrator handles multi-agent coordination
 - **Only handle directly:** pure questions and single-file lookups
 
+### P7: Error & Resilience Planning
+
+Every developer agent must plan for **failure scenarios**, not just the happy path. Before considering implementation complete:
+
+1. **Identify failure points** — what external dependencies can fail? (database, APIs, file systems, network, queues)
+2. **Handle each failure explicitly:**
+
+| Failure Type | Required Handling |
+|-------------|------------------|
+| Database offline / connection refused | Retry with backoff, clear error message, graceful shutdown |
+| Database locks / deadlocks | Retry with jitter, timeout configuration, log the lock |
+| Network timeout / API unreachable | Retry with exponential backoff, circuit breaker for repeated failures |
+| File not found / permission denied | Fail fast with actionable error message (path, permission needed) |
+| Disk full / write failure | Check space before bulk writes, fail with clear message |
+| Invalid/corrupt input data | Validate before processing, quarantine bad records, continue with good |
+| Out of memory | Batch processing, streaming, chunked reads |
+| Partial failure (N of M succeeded) | Track progress, support resume/restart from last checkpoint |
+| Configuration missing | Fail immediately at startup, list all missing vars |
+| Concurrent access / race conditions | Use locks, transactions, or idempotent operations |
+
+3. **Never silently swallow errors** — every caught exception must be logged or re-raised
+4. **Provide actionable error messages** — include what failed, why, and what the user can do
+
+**A feature that only works when everything goes right is not production-ready.**
+
 ---
 
 ## V: Validation Rules
@@ -308,6 +333,7 @@ When acting as a team lead (orchestrator):
 | New script | P3 | Check existing tools |
 | Script breaks | P4 | Fix immediately |
 | Before modifying | P5 | Understand first |
+| Writing any feature | P7 | Plan for errors, not just happy path |
 | Data corruption | R3 | STOP, assess, plan, then fix |
 | Credentials | S1 | Only in env vars |
 | Logging | S2 | Never log secrets |
