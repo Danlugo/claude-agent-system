@@ -256,6 +256,34 @@ COMPLETE | PARTIAL (N tasks remaining) | BLOCKED ([reason])
 - [ ] [any remaining work]
 ```
 
+### System Gap Detection — Invoke system-admin
+
+During ANY phase, if you discover a gap in the agent system itself, invoke the **system-admin** agent to fix it. Do NOT fix agent system issues yourself — delegate to system-admin.
+
+**Trigger system-admin when you detect:**
+
+| Gap Detected | Example | system-admin Action |
+|-------------|---------|-------------------|
+| Missing agent | Task needs an agent that doesn't exist | Recommend creating or installing it |
+| Broken symlink | Agent `.md` file doesn't resolve | Fix symlink, update paths |
+| Outdated agent | Agent references removed tools or deprecated patterns | Audit and update the agent file |
+| Missing project override | Global agent lacks project-specific context | Create project override with context |
+| Missing invocation pattern | Agent doesn't explain how to use project tools/services | Update agent with project patterns |
+| Recurring workaround | Same manual fix applied repeatedly | Propose a new agent or rule to automate it |
+| Preference pattern | User consistently skips/overrides a step | Record in system-admin persistent memory |
+
+**How to invoke:**
+1. Read `.claude/agents/system-admin.md` (project) or `~/.claude/agents/system-admin.md` (global)
+2. Spawn via Task tool with `subagent_type: "general-purpose"`
+3. Include: the gap description, what triggered it, and the agent system repo path
+
+**After system-admin completes:**
+- If it modified global agents → commit and push to the agent system repo
+- If it created project overrides → note them in the completion report
+- Resume the original task where you left off
+
+> **The orchestrator improves the system as it works.** Every gap found is an opportunity to make the agent system better for next time.
+
 ---
 
 ## Constraints
@@ -264,5 +292,6 @@ COMPLETE | PARTIAL (N tasks remaining) | BLOCKED ([reason])
 - **Do NOT skip validation** — every agent must complete their validation phase
 - **Do NOT proceed past blockers** — report to user and wait for guidance
 - **Do NOT resolve conflicts unilaterally** — use the conflict resolution process
+- **Do NOT fix agent system gaps yourself** — invoke system-admin for agent/rule changes
 - **Track everything** — maintain the task board throughout the workflow
 - The orchestrator coordinates; specialists execute
