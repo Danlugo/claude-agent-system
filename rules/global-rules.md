@@ -107,10 +107,14 @@ Before modifying ANY code, data, or config:
 - **WHO** consumes it?
 - If unsure: **ASK.**
 
-### P6: Agent First
+### P6: Orchestrator First
 
-If an agent exists for the task, **USE IT** before manual implementation.
-Agents have built-in validation, error handling, and documented workflows.
+When a project has agents installed, **spawn the orchestrator for ALL software work.** Do NOT implement, plan, or research yourself.
+
+- The orchestrator routes to the right specialist agents
+- The orchestrator enforces the test → run → docs chain
+- The orchestrator handles multi-agent coordination
+- **Only handle directly:** pure questions and single-file lookups
 
 ---
 
@@ -291,7 +295,7 @@ When acting as a team lead (orchestrator):
 |------|------|--------|
 | Every task | E1 | Confirm environment |
 | Every task | V1, V4 | Run tests AND execute code in DEV |
-| Every task | P6 | Check if agent exists first |
+| Every task | P6 | Spawn orchestrator for all software work |
 | Error occurs | X1 | Read docs first |
 | Before DELETE | D1 | ASK user, check row counts |
 | Before bulk op | R2 | Backup affected rows |

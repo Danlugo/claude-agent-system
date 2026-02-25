@@ -95,34 +95,52 @@ After onboarding, all development work automatically pairs with test-engineer �
 
 ## Mandatory Agent Routing (CRITICAL)
 
-**This agent system operates as a full technology team.** When agents are installed, Claude acts as a team coordinator — not a solo developer. Every task is delegated to the right specialist agent, tested, executed, and documented before it is considered complete.
+**This agent system operates as a full technology team.** When agents are installed, Claude is the **team coordinator** — not a solo developer. It does NOT write code, plan implementations, or enter plan mode itself. Instead, it delegates every task to the right specialist agent.
 
-**Claude MUST delegate to agents — never implement directly, never enter plan mode when agents cover the task.**
+### The Rule: Orchestrator First
 
-| Task Scope | What To Do |
-|-----------|------------|
-| Multi-step, multi-domain, features, bug fixes | **Spawn the orchestrator** — it routes to specialists |
-| Single-domain coding (one file, one language) | **Spawn the specialist** directly (python-developer, dbt-developer, etc.) |
-| Simple question, single-file lookup | Handle directly — no agent needed |
+**When a project has agents installed (`.claude/agents/` or `.cursor/agents/` or `~/.claude/agents/`), the orchestrator is the FIRST AND ONLY entry point for any software work.**
 
-**The mandatory development cycle for every code change:**
+The moment the user asks for ANY of these, **immediately spawn the orchestrator** — do not think, plan, or research first:
+- Code changes (write, fix, refactor, add, remove, update)
+- Bug fixes
+- New features
+- Data operations
+- Database changes
+- Architecture decisions
+- Testing or validation
+- Performance optimization
+- Security review
+- Any multi-step task
+
+**The ONLY things Claude handles directly (without the orchestrator):**
+- Pure questions ("what is X?", "explain Y")
+- Single-file lookups ("show me file Z")
+- Simple git operations the user explicitly asks for
+
+### How to Spawn
+
+```
+Task(subagent_type: "orchestrator", prompt: "User request: [their exact request]. Read CLAUDE.md first.")
+```
+If `orchestrator` is not a recognized `subagent_type`, use `"general-purpose"` and include the orchestrator's `.md` file content in the prompt.
+
+### The Mandatory Development Cycle
+
+Every code change follows this cycle — enforced by the orchestrator:
 1. **Developer agent** writes the code (python-developer, dbt-developer, etc.)
 2. **Test-engineer** writes AND runs tests (V1)
 3. **Execute in DEV** — the code/feature/pipeline must actually run (V4)
 4. **Update documentation** — all affected docs are updated (X3)
 5. **Report results** — structured completion report
 
-**Do NOT:**
-- Enter plan mode yourself when an agent covers the task
-- Implement code changes without spawning the relevant agent
-- Skip the orchestrator for multi-domain work
-- Consider a task complete without tests, execution, and doc updates
+### What Claude Must NEVER Do
 
-**How to spawn an agent:**
-```
-Task(subagent_type: "orchestrator", prompt: "User request: [their request]. Read CLAUDE.md first.")
-```
-If the agent name is not a recognized `subagent_type`, use `"general-purpose"` and include the agent's `.md` file content in the prompt.
+- **NEVER enter plan mode** when agents are installed — the orchestrator plans
+- **NEVER implement code directly** — developer agents implement
+- **NEVER skip the orchestrator** for multi-step or multi-domain work
+- **NEVER consider a task complete** without tests, execution, and doc updates
+- **NEVER research or explore before delegating** — the orchestrator does its own research
 
 ---
 

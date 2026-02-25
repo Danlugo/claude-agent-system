@@ -40,37 +40,26 @@ Read project `CLAUDE.md` and any relevant project docs.
 | Data operations | ETL docs, data flow docs |
 | Deployments | Runbooks, deployment docs |
 
-### Step 3: Delegate to Agent (MANDATORY — P6)
+### Step 3: Spawn the Orchestrator (MANDATORY — P6)
 
-If an agent exists for this task, **spawn it via the Task tool. Do NOT plan or implement the task yourself.**
+> **This is not optional. If the project has agents installed, STOP HERE and spawn the orchestrator. Do NOT continue to Steps 4-10 yourself.**
 
-| Task Scope | Action |
-|-----------|--------|
-| Multi-step / multi-domain | **Spawn orchestrator** — it routes to specialists |
-| Single-domain coding | **Spawn the specialist** directly (see table below) |
-| Simple lookup / question | Handle directly — no agent needed |
+**For ANY software work** (code, data, infrastructure, testing, architecture, security, performance):
 
-| Task Type | Spawn Agent |
-|-----------|-------------|
-| Full feature | **orchestrator** → routes to specialists |
-| Architecture | solution-architect, data-architect, integration-architect |
-| Python code | python-developer |
-| dbt models | dbt-developer |
-| SQL/schema | database-developer |
-| Frontend/UI | frontend-developer |
-| API | api-developer |
-| Power BI | powerbi-developer |
-| Pipelines | data-engineer |
-| Testing | test-engineer, data-quality-engineer, qa-automation |
-| Code review | code-reviewer |
-| Deployment | devops-engineer, release-manager |
-| Monitoring | sre-engineer |
-| Security | security-engineer |
-| Performance | performance-engineer |
-| Documentation | doc-writer |
-| Analysis | data-analyst |
+```
+Task(subagent_type: "orchestrator", prompt: "User request: [their request]. Read CLAUDE.md first.")
+```
 
-**How to spawn:** `Task(subagent_type: "[agent-name]", prompt: "...")`. If not a built-in type, use `"general-purpose"` and include the agent's `.md` content in the prompt.
+The orchestrator handles Steps 4-10 internally — it plans, routes to specialists, tests, runs, and updates docs.
+
+**Handle directly ONLY if:**
+- Pure question with zero actions ("what is a staging table?")
+- Single-file lookup ("show me file X")
+- Simple git operation the user explicitly asked for
+
+**If `orchestrator` is not a built-in subagent_type**, use `"general-purpose"` and include the orchestrator's `.md` file content in the prompt.
+
+> **Why the orchestrator and not individual agents?** The orchestrator knows the full agent roster, enforces the test→run→docs chain, handles multi-agent coordination, and ensures nothing is skipped. Spawning individual agents directly risks missing tests, skipping docs, or choosing the wrong specialist.
 
 ### Step 4: Test & Validation Plan
 
