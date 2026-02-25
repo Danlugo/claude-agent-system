@@ -152,25 +152,48 @@ Rules:
 
 ### Phase 3: Execute — Invoke Agents
 
-For each task on the board:
+**How to invoke agents in Claude Code:**
 
-1. **Invoke the specialist agent** with clear context:
-   - What to do (task description)
-   - What the user wants (original request)
-   - What's already done (completed tasks)
-   - What comes next (downstream dependencies)
+Claude Code's Task tool only supports built-in `subagent_type` values (`general-purpose`, `Bash`, `Explore`, `Plan`), NOT custom agent names. To invoke a specialist agent, you MUST:
 
-2. **Monitor results:**
-   - Did the agent produce the expected output?
-   - Did validation pass?
-   - Are there blockers for downstream tasks?
+1. **Read the agent's `.md` file** to get its full instructions
+2. **Use the Task tool** with `subagent_type: "general-purpose"`
+3. **Include in the prompt:** the agent's instructions + task context + path to `CLAUDE.md`
 
-3. **Update the task board** after each agent completes.
+```
+Task(
+  subagent_type: "general-purpose",
+  description: "[agent-name] - [short task description]",
+  prompt: "You are acting as the [agent-name] agent.\n\n
+           [Paste the full contents of the agent's .md file]\n\n
+           ## Your Task\n
+           [What to do]\n\n
+           ## Context\n
+           - User request: [original request]\n
+           - Completed so far: [previous tasks]\n
+           - Next in chain: [downstream tasks]\n
+           - Environment: DEV\n\n
+           Read CLAUDE.md for project rules before starting."
+)
+```
 
-4. **Test pairing (MANDATORY):**
-   After ANY development agent completes (python-developer, api-developer, frontend-developer, dbt-developer, database-developer, data-engineer, powerbi-developer), ALWAYS schedule `test-engineer` as the next task on the board — unless the user explicitly said "skip tests."
-   - The test-engineer runs in **paired mode**: it receives the developer agent's output and writes/runs tests for the changes made.
-   - This is automatic — do NOT ask the user for permission to run tests.
+**Agent file locations:**
+- Project agents: `.claude/agents/*.md` (take priority)
+- Project agents (Cursor): `.cursor/agents/*.md` (if the project uses Cursor)
+- Global agents: `~/.claude/agents/*.md` (fallback)
+
+**For each task on the board:**
+
+1. **Read the agent definition** — check project override first, then global
+2. **Spawn a subagent** via the Task tool using the pattern above
+3. **Pass full context:** task description, user request, completed tasks, downstream dependencies
+4. **Monitor results:** Did the agent produce expected output? Did validation pass? Any blockers?
+5. **Update the task board** after each agent completes.
+
+**Test pairing (MANDATORY):**
+After ANY development agent completes (python-developer, api-developer, frontend-developer, dbt-developer, database-developer, data-engineer, powerbi-developer), ALWAYS invoke `test-engineer` as the next task — unless the user explicitly said "skip tests."
+- The test-engineer runs in **paired mode**: it receives the developer agent's output and writes/runs tests for the changes made.
+- This is automatic — do NOT ask the user for permission to run tests.
 
 ### Phase 4: Conflict Resolution
 
