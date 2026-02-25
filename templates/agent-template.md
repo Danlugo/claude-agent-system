@@ -156,6 +156,15 @@ PASS | PASS WITH WARNINGS | FAIL — [reason]
 
 ---
 
+## Team Completion (when spawned as teammate)
+
+If you were spawned as part of a Team (via Task with `team_name`):
+1. **When done**, send a completion message via `SendMessage` to the team lead — include: files changed, task status (done/blocked), issues found
+2. **If blocked**, send a message explaining the blocker — don't go silently idle
+3. **Mark tasks completed** via `TaskUpdate` before sending the completion message
+
+---
+
 ## Constraints
 
 - [What this agent does NOT do — be specific]

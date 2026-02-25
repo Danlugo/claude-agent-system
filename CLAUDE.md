@@ -79,6 +79,7 @@ After onboarding, all development work automatically pairs with test-engineer �
 | `rules/` | 13 | Shared standards (global, workflow, python, dbt, database, frontend, api, powerbi, security, testing, devops, documentation, onboarding) |
 | `templates/` | 3 | Agent template, rule template, project setup flow reference |
 | `scripts/` | 3 | install-global, install-project, migrate-cursor-agents |
+| `docs/` | 1 | Audit checklist for system-admin agent |
 | `examples/` | 2 | Hotel ETL project override examples |
 
 ---
@@ -89,6 +90,29 @@ After onboarding, all development work automatically pairs with test-engineer �
 2. **Global rules** — Symlinked to `~/.claude/rules/` (referenced by agents)
 3. **Project overrides** — A project can override any agent by placing a same-named `.md` in `.claude/agents/`
 4. **Orchestrator** — Main entry point that routes tasks to the right specialist agent
+
+---
+
+## Mandatory Agent Routing (CRITICAL)
+
+**When a project has agents installed, Claude MUST delegate — not implement directly.**
+
+| Task Scope | What To Do |
+|-----------|------------|
+| Multi-step, multi-domain, features, bug fixes | **Spawn the orchestrator** — it routes to specialists |
+| Single-domain coding (one file, one language) | **Spawn the specialist** directly (python-developer, dbt-developer, etc.) |
+| Simple question, single-file lookup | Handle directly — no agent needed |
+
+**Do NOT:**
+- Enter plan mode yourself when an agent covers the task
+- Implement code changes without spawning the relevant agent
+- Skip the orchestrator for multi-domain work
+
+**How to spawn an agent:**
+```
+Task(subagent_type: "orchestrator", prompt: "User request: [their request]. Read CLAUDE.md first.")
+```
+If the agent name is not a recognized `subagent_type`, use `"general-purpose"` and include the agent's `.md` file content in the prompt.
 
 ---
 
@@ -106,8 +130,6 @@ After onboarding, all development work automatically pairs with test-engineer �
 | "optimize performance" | performance-engineer |
 | "audit the agent system" | **system-admin** |
 | Multi-domain question | **orchestrator** (it handles multi-agent coordination) |
-
-**Rule of thumb:** If the task involves more than one agent, route through the **orchestrator**.
 
 ---
 

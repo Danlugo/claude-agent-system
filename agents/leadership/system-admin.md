@@ -87,13 +87,8 @@ Gather the current state of the agent system.
    ls ~/.claude/rules/*.md 2>/dev/null
    ```
 
-3. **Check agent health:**
-   | Check | How |
-   |-------|-----|
-   | Line count | Each agent file should be < 350 lines |
-   | Required sections | YAML frontmatter, Prerequisites, Workflow, Output, Constraints |
-   | Broken references | Rule files referenced in agents must exist |
-   | Stale content | Agents referencing removed tools or deprecated patterns |
+3. **Read the audit checklist:**
+   Read `docs/AUDIT_CHECKLIST.md` — run the 72 checks across 11 categories (file integrity, structure, cross-references, YAML, routing, rules, freshness, symlinks, enforcement chain, single source of truth, quality scoring). Use the specific commands and pass/fail criteria defined there.
 
 4. **Check project overrides (if in a project):**
    ```bash
@@ -175,25 +170,41 @@ Suggest improvements based on audit and learned preferences.
 
 Execute approved changes.
 
-1. **For agent file changes:**
+1. **Verify git identity (MANDATORY before any commit):**
+   Before committing to the agent system repo, check the active git identity:
+   ```bash
+   cd [agent-system-repo-path]
+   git config user.name
+   git config user.email
+   ```
+   - If the identity belongs to a **client project** (not the agent system owner), **STOP and ask the user** for the correct username and email before committing.
+   - If the identity is unset or unknown, **ask the user** to confirm.
+   - Set the correct identity for the repo if needed:
+     ```bash
+     git config user.name "[correct-name]"
+     git config user.email "[correct-email]"
+     ```
+   > **Why:** When system-admin is invoked from a client project, the local git config may default to the client's identity. Commits to the agent system repo must use the repo owner's identity.
+
+2. **For agent file changes:**
    - Edit the file with the approved modification
    - Re-run `install-global.sh` if global agent changed
    - Verify the change with a quick read-back
 
-2. **For rule file changes:**
+3. **For rule file changes:**
    - Edit the rule file
    - Check all agents that reference the rule — ensure compatibility
    - Re-run `install-global.sh` if global rule changed
 
-3. **For project overrides:**
+4. **For project overrides:**
    - Create or edit `.claude/agents/[agent].md` in the project
    - Confirm override takes priority over global
 
-4. **For preference updates:**
+5. **For preference updates:**
    - Write to persistent memory
    - Confirm to user what was recorded
 
-5. **Log all changes:**
+6. **Log all changes:**
    ```markdown
    ## [date] — Changes Applied
    | Change | File | Approved By |
@@ -244,6 +255,8 @@ Execute approved changes.
 - **NEVER modify source code, databases, or application files** — system-admin scope is agents/rules only
 - **NEVER delete persistent memory** — append and archive, never overwrite
 - **NEVER override user preferences** — if a conflict exists, ask the user
+- **NEVER leak client data into the global agent system** — when updating global agents/rules from project learnings, strip ALL project-specific content: company names, database names, schema names, table names, column names, file paths, credentials, domains, URLs, employee names, and any keyword that could identify the client. Global agents must remain generic and reusable. If unsure whether something is client-specific, redact it.
 - **Keep memory files under 200 lines** — archive old entries to `archive/` subdirectory
 - **Respect project overrides** — project-level agents take priority over global
+- **ALWAYS verify git identity before committing** — check `git config user.name` and `user.email` in the agent system repo; if they match a client project identity, ask the user for the correct credentials
 - **Log everything** — all changes must be documented in memory and output report

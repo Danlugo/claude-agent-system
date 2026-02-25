@@ -105,6 +105,7 @@ Analyze the user's request and classify it:
 | "document", "write docs", "README", "runbook" | Documentation | doc-writer |
 | "analyze data", "report", "insight", "query" | Analysis | data-analyst |
 | "audit agents", "update preferences", "system health" | System admin | system-admin |
+| "issue #N", "spec issue", "analyze issue", "scope issue", "break down issue", "implement issue", "plan issue", "estimate issue", "start #N", "pick up #N", "prep #N" | Issue-to-spec | *see chain below* |
 
 **1.2 Route Development Tasks by Technology:**
 
@@ -129,6 +130,7 @@ If the task spans multiple domains, plan the agent chain:
 | Data pipeline | data-architect → database-developer → python-developer → dbt-developer → data-engineer → data-quality-engineer |
 | API feature | integration-architect → api-developer → test-engineer → security-engineer |
 | Report/dashboard | data-architect → database-developer → powerbi-developer → test-engineer |
+| Issue-to-spec | `gh issue view #N` → product-manager (requirements) → solution-architect (tech spec) → test-engineer (test strategy) → doc-writer (write `specs/issue-N-spec.md`) |
 
 ### Phase 2: Create Task Board
 
@@ -173,7 +175,8 @@ Task(
            - Completed so far: [previous tasks]\n
            - Next in chain: [downstream tasks]\n
            - Environment: DEV\n\n
-           Read CLAUDE.md for project rules before starting."
+           Read CLAUDE.md for project rules before starting.\n\n
+           IMPORTANT (Rule T1): When your task is complete, send a completion message via SendMessage to the team lead. Include: files changed, status (done/blocked), issues found. Do NOT go idle without reporting."
 )
 ```
 
@@ -194,6 +197,33 @@ Task(
 After ANY development agent completes (python-developer, api-developer, frontend-developer, dbt-developer, database-developer, data-engineer, powerbi-developer), ALWAYS invoke `test-engineer` as the next task — unless the user explicitly said "skip tests."
 - The test-engineer runs in **paired mode**: it receives the developer agent's output and writes/runs tests for the changes made.
 - This is automatic — do NOT ask the user for permission to run tests.
+
+### Multi-Agent Coordination: Teams Framework
+
+When coordinating 3+ agents with interdependent work, use Claude Code's Teams framework instead of independent Tasks.
+
+**When to use Teams vs independent Tasks:**
+
+| Scenario | Approach | Why |
+|----------|----------|-----|
+| 2 independent agents | Task (background) | Simple, no coordination needed |
+| 3+ agents, independent work | Task (parallel background) | Low overhead, orchestrator merges results |
+| 3+ agents, interdependent work | Teams (TeamCreate) | Agents message each other, share task lists |
+| Complex feature with handoffs | Teams (TeamCreate) | Direct agent-to-agent coordination |
+
+**How to use Teams:**
+
+1. Create team: `TeamCreate({ team_name: "feature-x", description: "..." })`
+2. Spawn teammates: `Task({ subagent_type: "general-purpose", team_name: "feature-x", name: "dbt-dev", prompt: "..." })`
+3. Agents communicate: `SendMessage({ type: "message", recipient: "dbt-dev", content: "...", summary: "..." })`
+4. Shutdown: `SendMessage({ type: "shutdown_request", recipient: "dbt-dev" })`
+5. Cleanup: `TeamDelete()`
+
+**MANDATORY for every teammate prompt (Rule T1):**
+Include in every teammate's prompt: *"When done, send a completion message via SendMessage to the team lead. Include: files changed, status (done/blocked), any issues. Do NOT go idle without reporting."*
+
+**Team lead follow-up (Rule T2):**
+After spawning teammates: wait for completion messages, verify deliverables, don't assume idle = done. Shut down teammates via `shutdown_request` when all work is complete.
 
 ### Phase 4: Conflict Resolution
 
@@ -255,6 +285,29 @@ COMPLETE | PARTIAL (N tasks remaining) | BLOCKED ([reason])
 ### Follow-up Items
 - [ ] [any remaining work]
 ```
+
+### Post-change documentation update (MANDATORY)
+
+After ANY task or feature is completed, update ALL related documentation. This is the **final step** before reporting completion.
+
+**What to update:**
+
+| Artifact | Where | What to check |
+|----------|-------|---------------|
+| Domain docs | Project docs directory | New tools, tests, commands, tables, troubleshooting entries |
+| Troubleshooting | Troubleshooting doc | New incidents, new validation tools |
+| Agents | Agent directories | Updated commands, new test references, changed column names |
+| Skills | Skill directories | New tools, updated quick commands |
+| Change log | Reports directory | All changes documented |
+
+**How to find what needs updating:**
+
+1. List all files that were created or modified in the task
+2. For each modified file, search agents/skills/docs for references to that file or its concepts
+3. Update any stale references (old column names, missing tools, outdated test counts)
+4. If a new tool/test/view was created, add it to the relevant domain doc
+
+**Do NOT skip this step.** Documentation drift causes agents to use outdated queries, miss new validation tools, and give incorrect instructions.
 
 ### System Gap Detection — Invoke system-admin
 
