@@ -106,7 +106,7 @@ Gather the current state of the agent system.
    | Global agents | N |
    | Global rules | N |
    | Project overrides | N |
-   | Agents over 350 lines | [list or "none"] |
+   | Agents over 500 lines | [list or "none"] |
    | Missing rule references | [list or "none"] |
    | Last preference update | [date or "never"] |
    ```

@@ -67,10 +67,10 @@ model: sonnet
 | Environment | E1, E2 | DEV default, PROD needs approval |
 | Data Safety | D1 | ASK before DELETE |
 | Process | P3, P5, P6 | No duplicates, understand first, agent first |
-| Validation | V1 | Test all changes |
+| Validation | V1, V4 | Test all changes, run/execute in DEV |
 | Recovery | R1 | Rollback plan before destructive ops |
 | Security | S1, S3 | No hardcoded secrets, no secrets in git |
-| Documentation | X1, X2 | Read docs on error, log changes |
+| Documentation | X1, X2, X3 | Read docs on error, log changes, update docs after changes |
 
 ### Delegation
 
@@ -80,7 +80,7 @@ model: sonnet
 
 ---
 
-## Task: 5-Phase Workflow
+## Task: 6-Phase Workflow
 
 ### Phase 1: Understand Context
 
@@ -103,19 +103,45 @@ model: sonnet
 2. [Step 2]
 3. [Step N]
 
-### Phase 4: Test
+### Phase 4: Test & Run (MANDATORY — V1, V4)
 
-1. Write/update tests for the changes made
-2. Run the full applicable test suite
-3. Verify no regressions introduced
-4. Report: "Tests: X passed, Y failed, Z skipped"
+> **A task is NOT complete until tests pass and the code runs successfully.**
 
-### Phase 5: Validate (MANDATORY)
+1. **Write/update tests** for every change made — no exceptions
+2. **Run the full applicable test suite** — not just the new tests
+3. **Execute/run the feature, script, or pipeline** to verify it works end-to-end in DEV
+4. **Verify no regressions** — existing functionality must still work
+5. **If tests fail → FIX immediately** — do not proceed to Phase 5
+6. Report: "Tests: X passed, Y failed, Z skipped | Execution: success/fail"
+
+| Change Type | Must Test | Must Run |
+|-------------|-----------|----------|
+| New script/tool | Unit tests + integration test | Execute the script in DEV |
+| New feature | Unit tests + feature tests | Run the feature end-to-end |
+| Bug fix | Regression test proving fix | Run affected workflow |
+| dbt model | schema tests + custom tests | `dbt build --select model` |
+| API endpoint | Request/response tests | Hit the endpoint in DEV |
+| ETL pipeline | Data quality tests | Run the pipeline in DEV |
+
+### Phase 5: Update Documentation (MANDATORY — X2, X3)
+
+> **A task is NOT complete until all affected documentation is updated.**
+
+1. **List all files created or modified** in this task
+2. **Search project docs** for references to modified files, functions, or concepts
+3. **Update every stale reference** — old names, missing tools, outdated counts, changed behavior
+4. **If a new tool/test/script was created**, add it to the relevant doc section
+5. **Log the change** — what changed, why, and when (X2)
+6. **If no docs exist for this area**, create a brief entry in the appropriate doc
+
+**Do NOT skip this phase.** Stale docs cause agents to use wrong queries, miss tools, and give bad instructions.
+
+### Phase 6: Final Validation (MANDATORY)
 
 1. Run all applicable validation checks
 2. Verify referential integrity if data changed
 3. Check for security issues (S1-S5)
-4. Confirm documentation updated (X2, X3)
+4. Confirm: tests pass, code runs, docs updated
 5. Produce structured output report
 
 ---
@@ -143,7 +169,9 @@ Write structured report:
 ## Validation Results
 | Check | Status |
 |-------|--------|
+| Tests written | pass/fail |
 | Tests pass | pass/fail |
+| Code runs in DEV | pass/fail |
 | No regressions | pass/fail |
 | Docs updated | pass/fail |
 

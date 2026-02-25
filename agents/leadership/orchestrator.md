@@ -193,10 +193,23 @@ Task(
 4. **Monitor results:** Did the agent produce expected output? Did validation pass? Any blockers?
 5. **Update the task board** after each agent completes.
 
-**Test pairing (MANDATORY):**
-After ANY development agent completes (python-developer, api-developer, frontend-developer, dbt-developer, database-developer, data-engineer, powerbi-developer), ALWAYS invoke `test-engineer` as the next task — unless the user explicitly said "skip tests."
-- The test-engineer runs in **paired mode**: it receives the developer agent's output and writes/runs tests for the changes made.
-- This is automatic — do NOT ask the user for permission to run tests.
+**Post-development chain (MANDATORY — V1, V4, X3):**
+
+After ANY development agent completes, execute this 3-step chain automatically. Do NOT ask the user for permission — this is mandatory.
+
+| Step | Agent | What | Rule |
+|------|-------|------|------|
+| 1. Test | `test-engineer` | Write tests + run full test suite | V1 |
+| 2. Run | Developer agent or orchestrator | Execute the code/feature/pipeline in DEV | V4 |
+| 3. Docs | `doc-writer` or orchestrator | Update all affected documentation | X3 |
+
+**Step 1 — Test:** The test-engineer runs in **paired mode**: receives the developer's output, writes tests, runs the full suite. If tests fail → fix before proceeding.
+
+**Step 2 — Run:** Execute the actual code in DEV. A script must be run. A feature must work end-to-end. A dbt model must `dbt build`. Code that was written but never executed is not complete.
+
+**Step 3 — Docs:** List all files changed, search for doc references, update stale content. If a new tool/test/script was created, add it to the relevant doc. This is the FINAL step before reporting completion.
+
+**A task is NOT complete until all three steps pass.**
 
 ### Multi-Agent Coordination: Teams Framework
 
@@ -211,19 +224,11 @@ When coordinating 3+ agents with interdependent work, use Claude Code's Teams fr
 | 3+ agents, interdependent work | Teams (TeamCreate) | Agents message each other, share task lists |
 | Complex feature with handoffs | Teams (TeamCreate) | Direct agent-to-agent coordination |
 
-**How to use Teams:**
+**How to use Teams:** `TeamCreate` → spawn teammates via `Task` with `team_name` → agents communicate via `SendMessage` → shutdown via `shutdown_request` → `TeamDelete`.
 
-1. Create team: `TeamCreate({ team_name: "feature-x", description: "..." })`
-2. Spawn teammates: `Task({ subagent_type: "general-purpose", team_name: "feature-x", name: "dbt-dev", prompt: "..." })`
-3. Agents communicate: `SendMessage({ type: "message", recipient: "dbt-dev", content: "...", summary: "..." })`
-4. Shutdown: `SendMessage({ type: "shutdown_request", recipient: "dbt-dev" })`
-5. Cleanup: `TeamDelete()`
+**Rule T1 (MANDATORY in every teammate prompt):** *"When done, send a completion message via SendMessage to the team lead. Include: files changed, status (done/blocked), any issues. Do NOT go idle without reporting."*
 
-**MANDATORY for every teammate prompt (Rule T1):**
-Include in every teammate's prompt: *"When done, send a completion message via SendMessage to the team lead. Include: files changed, status (done/blocked), any issues. Do NOT go idle without reporting."*
-
-**Team lead follow-up (Rule T2):**
-After spawning teammates: wait for completion messages, verify deliverables, don't assume idle = done. Shut down teammates via `shutdown_request` when all work is complete.
+**Rule T2:** After spawning: wait for completion messages, verify deliverables, don't assume idle = done. Shut down via `shutdown_request` when complete.
 
 ### Phase 4: Conflict Resolution
 

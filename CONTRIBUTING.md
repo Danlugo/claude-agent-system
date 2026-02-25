@@ -12,19 +12,19 @@ Thanks for your interest in improving the Claude Agent System! This guide covers
    - `agents/quality/` - Testing and review
    - `agents/operations/` - CI/CD, deployment, monitoring
    - `agents/specialist/` - Domain-specific expertise
-3. Follow the 5-phase workflow structure (Understand, Plan, Execute, Test, Validate)
+3. Follow the 6-phase workflow structure (Understand, Plan, Execute, Test & Run, Update Docs, Final Validation)
 4. Include YAML frontmatter: `name`, `description`, `tools`, `model`
-5. Keep the file under **350 lines**
+5. Keep the file under **500 lines**
 
 ### Agent Checklist
 
 - [ ] YAML frontmatter with all required fields
 - [ ] Prerequisites section with mandatory reading list
 - [ ] Delegation table (when to hand off to other agents)
-- [ ] 5-phase workflow
+- [ ] 6-phase workflow
 - [ ] Output template (structured report)
 - [ ] Constraints section
-- [ ] Under 350 lines
+- [ ] Under 500 lines
 
 ## Adding a New Rule
 
@@ -51,7 +51,7 @@ Thanks for your interest in improving the Claude Agent System! This guide covers
 
 - [ ] No hardcoded secrets, API keys, or credentials
 - [ ] No company-specific or client-specific references (use generic examples)
-- [ ] All agent files under 350 lines
+- [ ] All agent files under 500 lines
 - [ ] All rule files under 150 lines
 - [ ] `install-global.sh` runs successfully with correct agent/rule counts
 - [ ] Description explains what was added/changed and why

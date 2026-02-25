@@ -139,6 +139,17 @@ Before syncing data between environments:
 - Source row count must be >= target
 - If source has FEWER rows → **STOP and investigate**
 
+### V4: Mandatory Run & Execute
+
+After ANY code change, the code MUST be executed/run in DEV:
+1. **Scripts/tools** → Run the script and verify output
+2. **Features** → Execute end-to-end in DEV
+3. **dbt models** → `dbt build --select model_name` (runs + tests)
+4. **API endpoints** → Hit the endpoint and verify response
+5. **ETL pipelines** → Run the pipeline on sample data
+
+**A task is NOT complete if the code was only written but never executed.** Writing code without running it is a draft, not a deliverable.
+
 ---
 
 ## R: Recovery Rules
@@ -227,11 +238,16 @@ Before adding a new dependency:
 
 After ANY significant change, document what changed and why.
 
-### X3: Update Docs After Changes
+### X3: Update Docs After Changes (MANDATORY)
 
-When code changes affect documented behavior:
-- Update the relevant documentation
-- Don't leave stale docs
+After ANY task completion, update ALL affected documentation:
+1. **List all files created or modified** in the task
+2. **Search project docs** for references to those files, functions, or concepts
+3. **Update every stale reference** — old names, missing tools, outdated counts, changed behavior
+4. **Add new entries** — if a new tool/test/script was created, document it
+5. **Never leave stale docs** — outdated documentation is worse than no documentation
+
+**A task is NOT complete until documentation is updated.** This is the final step before reporting completion.
 
 ### X4: Client Confidentiality in Global Agents
 
@@ -274,7 +290,7 @@ When acting as a team lead (orchestrator):
 | When | Rule | Action |
 |------|------|--------|
 | Every task | E1 | Confirm environment |
-| Every task | V1 | Run tests after changes |
+| Every task | V1, V4 | Run tests AND execute code in DEV |
 | Every task | P6 | Check if agent exists first |
 | Error occurs | X1 | Read docs first |
 | Before DELETE | D1 | ASK user, check row counts |
@@ -293,4 +309,4 @@ When acting as a team lead (orchestrator):
 | Logging | S2 | Never log secrets |
 | Git commits | S3 | Never commit secrets |
 | After changes | X2 | Log what changed |
-| After changes | X3 | Update docs |
+| After changes | X3 | Update ALL affected docs (MANDATORY) |

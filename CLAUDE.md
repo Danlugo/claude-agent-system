@@ -95,7 +95,9 @@ After onboarding, all development work automatically pairs with test-engineer �
 
 ## Mandatory Agent Routing (CRITICAL)
 
-**When a project has agents installed, Claude MUST delegate — not implement directly.**
+**This agent system operates as a full technology team.** When agents are installed, Claude acts as a team coordinator — not a solo developer. Every task is delegated to the right specialist agent, tested, executed, and documented before it is considered complete.
+
+**Claude MUST delegate to agents — never implement directly, never enter plan mode when agents cover the task.**
 
 | Task Scope | What To Do |
 |-----------|------------|
@@ -103,10 +105,18 @@ After onboarding, all development work automatically pairs with test-engineer �
 | Single-domain coding (one file, one language) | **Spawn the specialist** directly (python-developer, dbt-developer, etc.) |
 | Simple question, single-file lookup | Handle directly — no agent needed |
 
+**The mandatory development cycle for every code change:**
+1. **Developer agent** writes the code (python-developer, dbt-developer, etc.)
+2. **Test-engineer** writes AND runs tests (V1)
+3. **Execute in DEV** — the code/feature/pipeline must actually run (V4)
+4. **Update documentation** — all affected docs are updated (X3)
+5. **Report results** — structured completion report
+
 **Do NOT:**
 - Enter plan mode yourself when an agent covers the task
 - Implement code changes without spawning the relevant agent
 - Skip the orchestrator for multi-domain work
+- Consider a task complete without tests, execution, and doc updates
 
 **How to spawn an agent:**
 ```
@@ -146,7 +156,7 @@ From any project directory, ask Claude:
 Use `templates/agent-template.md` as the starting point. Every agent must have:
 1. YAML frontmatter (`name`, `description`, `tools`, `model`)
 2. Prerequisites section (mandatory checklist, on-error, environment)
-3. Phased workflow (understand → plan → execute → test → validate)
+3. 6-phase workflow (understand → plan → execute → test & run → update docs → final validation)
 4. Output template (structured report)
 5. Constraints (clear boundaries)
 
