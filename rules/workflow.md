@@ -40,37 +40,26 @@ Read project `CLAUDE.md` and any relevant project docs.
 | Data operations | ETL docs, data flow docs |
 | Deployments | Runbooks, deployment docs |
 
-### Step 3: Delegate to Agent (MANDATORY — P6)
+### Step 3: Spawn the Orchestrator (MANDATORY — P6)
 
-If an agent exists for this task, **spawn it via the Task tool. Do NOT plan or implement the task yourself.**
+> **This is not optional. If the project has agents installed, STOP HERE and spawn the orchestrator. Do NOT continue to Steps 4-10 yourself.**
 
-| Task Scope | Action |
-|-----------|--------|
-| Multi-step / multi-domain | **Spawn orchestrator** — it routes to specialists |
-| Single-domain coding | **Spawn the specialist** directly (see table below) |
-| Simple lookup / question | Handle directly — no agent needed |
+**For ANY software work** (code, data, infrastructure, testing, architecture, security, performance):
 
-| Task Type | Spawn Agent |
-|-----------|-------------|
-| Full feature | **orchestrator** → routes to specialists |
-| Architecture | solution-architect, data-architect, integration-architect |
-| Python code | python-developer |
-| dbt models | dbt-developer |
-| SQL/schema | database-developer |
-| Frontend/UI | frontend-developer |
-| API | api-developer |
-| Power BI | powerbi-developer |
-| Pipelines | data-engineer |
-| Testing | test-engineer, data-quality-engineer, qa-automation |
-| Code review | code-reviewer |
-| Deployment | devops-engineer, release-manager |
-| Monitoring | sre-engineer |
-| Security | security-engineer |
-| Performance | performance-engineer |
-| Documentation | doc-writer |
-| Analysis | data-analyst |
+```
+Task(subagent_type: "orchestrator", prompt: "User request: [their request]. Read CLAUDE.md first.")
+```
 
-**How to spawn:** `Task(subagent_type: "[agent-name]", prompt: "...")`. If not a built-in type, use `"general-purpose"` and include the agent's `.md` content in the prompt.
+The orchestrator handles Steps 4-10 internally — it plans, routes to specialists, tests, runs, and updates docs.
+
+**Handle directly ONLY if:**
+- Pure question with zero actions ("what is a staging table?")
+- Single-file lookup ("show me file X")
+- Simple git operation the user explicitly asked for
+
+**If `orchestrator` is not a built-in subagent_type**, use `"general-purpose"` and include the orchestrator's `.md` file content in the prompt.
+
+> **Why the orchestrator and not individual agents?** The orchestrator knows the full agent roster, enforces the test→run→docs chain, handles multi-agent coordination, and ensures nothing is skipped. Spawning individual agents directly risks missing tests, skipping docs, or choosing the wrong specialist.
 
 ### Step 4: Test & Validation Plan
 
@@ -97,11 +86,11 @@ List every rule that applies by category:
 
 | Task Type | E | D | P | V | R | S | X |
 |-----------|---|---|---|---|---|---|---|
-| Code change | E1 | — | P3, P5 | V1 | — | S1, S3 | X1, X2 |
-| Database change | E1, E2, E4 | D1, D2 | P5 | V1, V2 | R1, R2 | — | X2 |
-| Data operation | E1 | D1, D3 | P1 | V1, V2 | R1, R2 | — | X2 |
-| Deployment | E1 | D3 | P1 | V1 | R1 | S1 | X2 |
-| Bulk DELETE/UPDATE | E1, E4 | D1 | P5 | V2 | R1, R2 | — | X2 |
+| Code change | E1 | — | P3, P5, P7 | V1, V4 | — | S1, S3 | X1, X2, X3 |
+| Database change | E1, E2, E4 | D1, D2 | P5 | V1, V2, V4 | R1, R2 | — | X2, X3 |
+| Data operation | E1 | D1, D3 | P1 | V1, V2, V4 | R1, R2 | — | X2, X3 |
+| Deployment | E1 | D3 | P1 | V1, V4 | R1 | S1 | X2, X3 |
+| Bulk DELETE/UPDATE | E1, E4 | D1 | P5 | V2, V4 | R1, R2 | — | X2, X3 |
 
 ### Step 9: List Steps & Wait for Approval
 
@@ -127,11 +116,39 @@ Execute the plan, validating at each step:
 
 ---
 
-## Post-Execution (MANDATORY)
+## Post-Execution Chain (MANDATORY — every task, no exceptions)
 
-| Action | When | What |
-|--------|------|------|
-| Log changes | After ANY change | Document what changed and why |
-| Update docs | After behavior changes | Update relevant documentation |
-| Run tests | After ANY code/data change | Verify no regressions |
-| Report results | Always | Structured output per agent template |
+> **A task is NOT complete until all three steps pass. Do NOT report completion until this chain finishes.**
+
+### Step A: Test & Run (V1, V4, P7)
+
+1. **Write tests** for every change — unit tests minimum, integration tests for multi-component changes
+2. **Include error scenario tests** — database offline, invalid input, timeouts, partial failures (P7)
+3. **Run the full test suite** — not just new tests, ALL applicable tests
+4. **Execute the code in DEV** — run the script, pipeline, feature, or endpoint to verify it works end-to-end
+5. **If tests fail or execution fails → STOP and fix** — do not proceed to Step B
+
+| Change Type | Must Test | Must Run |
+|-------------|-----------|----------|
+| New script/tool | Unit + integration tests | Execute the script |
+| New feature | Unit + feature tests | Run end-to-end |
+| Bug fix | Regression test | Run affected workflow |
+| dbt model | Schema + custom tests | `dbt build --select model` |
+| API endpoint | Request/response tests | Hit the endpoint |
+| ETL pipeline | Data quality tests | Run the pipeline |
+
+### Step B: Update Documentation (X2, X3)
+
+1. **List all files created or modified** in this task
+2. **Search project docs** for references to modified files, functions, or concepts
+3. **Update every stale reference** — old names, missing tools, outdated counts
+4. **Add new entries** — if a new tool/test/script was created, add it to the relevant doc
+5. **Log the change** (X2) — what changed, why, and when
+
+### Step C: Report Results
+
+Produce structured output per agent template:
+- Files changed, tests added, tests passing
+- Execution status (ran successfully in DEV: yes/no)
+- Documentation updated (yes/no)
+- Final verdict: PASS / PASS WITH WARNINGS / FAIL

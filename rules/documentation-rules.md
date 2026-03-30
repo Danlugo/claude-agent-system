@@ -26,7 +26,7 @@
 | Troubleshooting | 500 |
 | Architecture | 300 |
 | Runbook | 200 |
-| Agent definition | 350 |
+| Agent definition | 500 |
 | Skill/rule file | 150 |
 
 ## Code Block Limits

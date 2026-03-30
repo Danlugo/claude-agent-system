@@ -38,11 +38,30 @@
 
 | Change Type | Required Test |
 |-------------|---------------|
-| New function | Unit test with happy path + edge cases |
+| New function | Unit test with happy path + edge cases + error scenarios |
 | Bug fix | Regression test proving the bug is fixed |
 | New dbt model | unique + not_null on PK, custom test if business logic |
-| API endpoint | Happy path + error cases + auth |
+| API endpoint | Happy path + error cases + auth + timeout/unavailable |
 | Schema change | Referential integrity + NULL checks |
+| ETL pipeline | Happy path + source unavailable + corrupt data + partial failure |
+
+### Error Scenario Tests (MANDATORY — P7)
+
+Every feature must include tests for failure paths, not just the happy path:
+
+| Error Scenario | What to Test |
+|---------------|-------------|
+| Database offline | Service raises clear error, no data corruption, retry if applicable |
+| Database lock/deadlock | Timeout behavior, retry with backoff, error message clarity |
+| Network timeout | Retry logic triggers, circuit breaker activates after N failures |
+| Invalid input data | Validation catches it, actionable error returned, good data unaffected |
+| File not found | Clear error message with path, no crash, graceful exit |
+| Partial failure | Progress tracked, resumable, succeeded records committed |
+| Out of memory (large data) | Chunked processing works, memory stays bounded |
+| Missing configuration | Startup fails fast, lists ALL missing vars (not one at a time) |
+| Concurrent operations | No race conditions, data integrity maintained |
+
+**Test naming for error scenarios:** `test_[function]_[error_type]` (e.g., `test_load_data_db_connection_refused`, `test_process_file_corrupt_csv`)
 
 ### Test Data
 

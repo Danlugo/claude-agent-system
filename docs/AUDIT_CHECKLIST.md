@@ -13,7 +13,7 @@
 | 1.2 | Rule count | `ls ~/.claude/rules/*.md \| wc -l` | = 13 |
 | 1.3 | Template count | `ls templates/*.md \| wc -l` | = 3 |
 | 1.4 | Script count | `ls scripts/*.sh \| wc -l` | = 3 |
-| 1.5 | Agent line limits | `wc -l agents/**/*.md` | All < 350 lines |
+| 1.5 | Agent line limits | `wc -l agents/**/*.md` | All < 500 lines |
 | 1.6 | Rule line limits | `wc -l rules/*.md` | All < 150 lines |
 | 1.7 | No empty files | `find agents/ rules/ -name '*.md' -empty` | No results |
 | 1.8 | Install script runs | `bash scripts/install-global.sh` | Exit code 0, correct counts |

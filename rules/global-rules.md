@@ -107,10 +107,39 @@ Before modifying ANY code, data, or config:
 - **WHO** consumes it?
 - If unsure: **ASK.**
 
-### P6: Agent First
+### P6: Orchestrator First
 
-If an agent exists for the task, **USE IT** before manual implementation.
-Agents have built-in validation, error handling, and documented workflows.
+When a project has agents installed, **spawn the orchestrator for ALL software work.** Do NOT implement, plan, or research yourself.
+
+- The orchestrator routes to the right specialist agents
+- The orchestrator enforces the test → run → docs chain
+- The orchestrator handles multi-agent coordination
+- **Only handle directly:** pure questions and single-file lookups
+
+### P7: Error & Resilience Planning
+
+Every developer agent must plan for **failure scenarios**, not just the happy path. Before considering implementation complete:
+
+1. **Identify failure points** — what external dependencies can fail? (database, APIs, file systems, network, queues)
+2. **Handle each failure explicitly:**
+
+| Failure Type | Required Handling |
+|-------------|------------------|
+| Database offline / connection refused | Retry with backoff, clear error message, graceful shutdown |
+| Database locks / deadlocks | Retry with jitter, timeout configuration, log the lock |
+| Network timeout / API unreachable | Retry with exponential backoff, circuit breaker for repeated failures |
+| File not found / permission denied | Fail fast with actionable error message (path, permission needed) |
+| Disk full / write failure | Check space before bulk writes, fail with clear message |
+| Invalid/corrupt input data | Validate before processing, quarantine bad records, continue with good |
+| Out of memory | Batch processing, streaming, chunked reads |
+| Partial failure (N of M succeeded) | Track progress, support resume/restart from last checkpoint |
+| Configuration missing | Fail immediately at startup, list all missing vars |
+| Concurrent access / race conditions | Use locks, transactions, or idempotent operations |
+
+3. **Never silently swallow errors** — every caught exception must be logged or re-raised
+4. **Provide actionable error messages** — include what failed, why, and what the user can do
+
+**A feature that only works when everything goes right is not production-ready.**
 
 ---
 
@@ -138,6 +167,17 @@ Before and after ANY bulk data operation:
 Before syncing data between environments:
 - Source row count must be >= target
 - If source has FEWER rows → **STOP and investigate**
+
+### V4: Mandatory Run & Execute
+
+After ANY code change, the code MUST be executed/run in DEV:
+1. **Scripts/tools** → Run the script and verify output
+2. **Features** → Execute end-to-end in DEV
+3. **dbt models** → `dbt build --select model_name` (runs + tests)
+4. **API endpoints** → Hit the endpoint and verify response
+5. **ETL pipelines** → Run the pipeline on sample data
+
+**A task is NOT complete if the code was only written but never executed.** Writing code without running it is a draft, not a deliverable.
 
 ---
 
@@ -227,11 +267,16 @@ Before adding a new dependency:
 
 After ANY significant change, document what changed and why.
 
-### X3: Update Docs After Changes
+### X3: Update Docs After Changes (MANDATORY)
 
-When code changes affect documented behavior:
-- Update the relevant documentation
-- Don't leave stale docs
+After ANY task completion, update ALL affected documentation:
+1. **List all files created or modified** in the task
+2. **Search project docs** for references to those files, functions, or concepts
+3. **Update every stale reference** — old names, missing tools, outdated counts, changed behavior
+4. **Add new entries** — if a new tool/test/script was created, document it
+5. **Never leave stale docs** — outdated documentation is worse than no documentation
+
+**A task is NOT complete until documentation is updated.** This is the final step before reporting completion.
 
 ### X4: Client Confidentiality in Global Agents
 
@@ -274,8 +319,8 @@ When acting as a team lead (orchestrator):
 | When | Rule | Action |
 |------|------|--------|
 | Every task | E1 | Confirm environment |
-| Every task | V1 | Run tests after changes |
-| Every task | P6 | Check if agent exists first |
+| Every task | V1, V4 | Run tests AND execute code in DEV |
+| Every task | P6 | Spawn orchestrator for all software work |
 | Error occurs | X1 | Read docs first |
 | Before DELETE | D1 | ASK user, check row counts |
 | Before bulk op | R2 | Backup affected rows |
@@ -288,9 +333,10 @@ When acting as a team lead (orchestrator):
 | New script | P3 | Check existing tools |
 | Script breaks | P4 | Fix immediately |
 | Before modifying | P5 | Understand first |
+| Writing any feature | P7 | Plan for errors, not just happy path |
 | Data corruption | R3 | STOP, assess, plan, then fix |
 | Credentials | S1 | Only in env vars |
 | Logging | S2 | Never log secrets |
 | Git commits | S3 | Never commit secrets |
 | After changes | X2 | Log what changed |
-| After changes | X3 | Update docs |
+| After changes | X3 | Update ALL affected docs (MANDATORY) |
